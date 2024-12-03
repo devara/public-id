@@ -12,6 +12,7 @@ import {
 } from '@nestjs/common';
 import compression from '@fastify/compress';
 import helmet from '@fastify/helmet';
+import fastifyCsrf from '@fastify/csrf-protection';
 import { AppModule } from './app.module';
 import { ConfigService } from '@nestjs/config';
 import { AvailableConfigType } from './config/config.type';
@@ -21,13 +22,17 @@ async function bootstrap() {
   const app = await NestFactory.create<NestFastifyApplication>(
     AppModule,
     new FastifyAdapter(),
+    {
+      cors: true,
+    },
   );
   const configService = app.get(ConfigService<AvailableConfigType>);
 
   const { apiPrefix, port } = configService.getOrThrow('app', { infer: true });
 
-  await app.register(compression);
   await app.register(helmet);
+  await app.register(fastifyCsrf);
+  await app.register(compression);
 
   app.setGlobalPrefix(apiPrefix, {
     exclude: [

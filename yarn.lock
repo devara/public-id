@@ -534,7 +534,25 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@fastify/error@npm:^3.2.0, @fastify/error@npm:^3.3.0, @fastify/error@npm:^3.4.0":
+"@fastify/csrf-protection@npm:6.4.1":
+  version: 6.4.1
+  resolution: "@fastify/csrf-protection@npm:6.4.1"
+  dependencies:
+    "@fastify/csrf": "npm:^6.0.0"
+    "@fastify/error": "npm:^3.0.0"
+    fastify-plugin: "npm:^4.0.0"
+  checksum: 10/253c912e96bf910cd04f42acfb19502a234784ba2098e51d849faca526b45f1215cebcb5582b555aaacbe6a4462fda4fdeaa5cdb0ebb7bbd81464449b661c45c
+  languageName: node
+  linkType: hard
+
+"@fastify/csrf@npm:^6.0.0":
+  version: 6.3.0
+  resolution: "@fastify/csrf@npm:6.3.0"
+  checksum: 10/9d88ba596935e499ba1f8e53db245b6a735bd0c6c697d1349e437e55e559923963dee155e201c1c26e2bb86b44143f18630deb8a7415b0454fc0d624fc8ca307
+  languageName: node
+  linkType: hard
+
+"@fastify/error@npm:^3.0.0, @fastify/error@npm:^3.2.0, @fastify/error@npm:^3.3.0, @fastify/error@npm:^3.4.0":
   version: 3.4.1
   resolution: "@fastify/error@npm:3.4.1"
   checksum: 10/4d63660f7d4a0d6091abf869208d30898bde82f513ca7be542243d9d740df743dd4be293e7db30858fca612dd512d28a818ea06dc674e06b445278fcefcdda92
@@ -1221,6 +1239,17 @@ __metadata:
     "@nestjs/platform-express":
       optional: true
   checksum: 10/f10aaed3dc1242789fd2e9dd3254794a9fdec18a94a5eb413cd7411ddf49b2c5f0dbfefd2e74f87e1c64e1866105f6b5dae058169aea306dc2305c3cb5d3ed2b
+  languageName: node
+  linkType: hard
+
+"@nestjs/throttler@npm:^6.2.1":
+  version: 6.2.1
+  resolution: "@nestjs/throttler@npm:6.2.1"
+  peerDependencies:
+    "@nestjs/common": ^7.0.0 || ^8.0.0 || ^9.0.0 || ^10.0.0
+    "@nestjs/core": ^7.0.0 || ^8.0.0 || ^9.0.0 || ^10.0.0
+    reflect-metadata: ^0.1.13 || ^0.2.0
+  checksum: 10/4fc05b62f4a115683e3f4072033c1dde5010a9390ee8c6df396a29e90a2599dc18b5c921c2a2958473f7bb66a8336ae014b969c0ff82c2d3b6869b028cb361ee
   languageName: node
   linkType: hard
 
@@ -6014,6 +6043,7 @@ __metadata:
   resolution: "public-id@workspace:."
   dependencies:
     "@fastify/compress": "npm:7.0.3"
+    "@fastify/csrf-protection": "npm:6.4.1"
     "@fastify/helmet": "npm:11.1.1"
     "@fastify/static": "npm:7.0.4"
     "@nestjs/cli": "npm:^10.0.0"
@@ -6025,6 +6055,7 @@ __metadata:
     "@nestjs/schematics": "npm:^10.0.0"
     "@nestjs/swagger": "npm:^8.0.7"
     "@nestjs/testing": "npm:^10.0.0"
+    "@nestjs/throttler": "npm:^6.2.1"
     "@types/express": "npm:^5.0.0"
     "@types/jest": "npm:^29.5.2"
     "@types/node": "npm:^20.3.1"

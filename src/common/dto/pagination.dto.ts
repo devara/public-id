@@ -3,7 +3,7 @@ import {
   DEFAULT_CURRENT_PAGE,
   DEFAULT_PER_PAGE,
 } from 'src/constants/app.constant';
-import { NumberField } from 'src/decorators/field.decorator';
+import { NumberField } from 'src/core/decorators/field.decorator';
 
 export class PaginationDto {
   @Transform(({ value }) => parseInt(value))

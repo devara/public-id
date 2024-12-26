@@ -15,8 +15,8 @@ import { InjectDatabaseConnection } from 'src/database/decorators/db.decorator';
 import { Connection } from 'mongoose';
 import { AuthLoginRequestDto } from '../dtos/request/auth.login.request.dto';
 import { AuthLoginResponseDto } from '../dtos/response/auth.login.response.dto';
-import { ENUM_USER_STATUS } from 'src/modules/user/enum/user.enum';
-import { ENUM_USER_STATUS_CODE_ERROR } from 'src/modules/user/enum/user.status-code.enum';
+import { ENUM_USER_STATUS } from 'src/modules/user/enums/user.enum';
+import { ENUM_USER_STATUS_CODE_ERROR } from 'src/modules/user/enums/user.status-code.enum';
 import { Response } from 'src/core/response/decorators/response.decorator';
 
 @Controller({

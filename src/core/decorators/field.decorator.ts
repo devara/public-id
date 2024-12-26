@@ -6,6 +6,7 @@ import {
   IsBoolean,
   IsDefined,
   IsEmail,
+  IsEnum,
   IsInt,
   IsNumber,
   IsOptional,
@@ -50,9 +51,9 @@ interface IStringFieldOptions extends IFieldOptions {
   toUpperCase?: boolean;
 }
 
-// interface IEnumFieldOptions extends IFieldOptions {
-//   enumName?: string;
-// }
+interface IEnumFieldOptions extends IFieldOptions {
+  enumName?: string;
+}
 
 type IBooleanFieldOptions = IFieldOptions;
 // type ITokenFieldOptions = IFieldOptions;
@@ -229,4 +230,37 @@ export function PasswordField(
   }
 
   return applyDecorators(...decorators);
+}
+
+export function EnumField<TEnum extends object>(
+  getEnum: () => TEnum,
+  options: Omit<ApiPropertyOptions, 'type' | 'enum' | 'isArray'> &
+    IEnumFieldOptions = {},
+): PropertyDecorator {
+  const decorators = [IsEnum(getEnum(), { each: options.each })];
+
+  if (options.nullable) {
+    decorators.push(IsNullable());
+  } else {
+    decorators.push(NotEquals(null));
+  }
+
+  if (options.swagger !== false) {
+    const { required = true, ...apiOptions } = options;
+    decorators.push(
+      ApiProperty({
+        enum: getEnum(),
+        enumName: options.enumName || getVariableName(getEnum),
+        isArray: options.each,
+        required: !!required,
+        ...apiOptions,
+      }),
+    );
+  }
+
+  return applyDecorators(...decorators);
+}
+
+function getVariableName(variableFunction: () => any) {
+  return variableFunction.toString().split('.').pop();
 }

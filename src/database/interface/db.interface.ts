@@ -1,4 +1,4 @@
-import type { FilterQuery, QueryOptions } from 'mongoose';
+import type { Document, FilterQuery, QueryOptions } from 'mongoose';
 
 export enum ENUM_PAGINATION_ORDER_DIRECTION_TYPE {
   ASC = 'asc',

@@ -53,3 +53,25 @@ export function DatabaseHelperQueryContain(
     },
   };
 }
+
+export function DatabaseHelperQuerySearch(
+  field: string,
+  value: string,
+  options?: IDatabaseQueryContainOptions,
+) {
+  if (options?.fullWord) {
+    return {
+      [field]: {
+        $regex: new RegExp(`/${value}/`),
+        $options: 'i',
+      },
+    };
+  }
+
+  return {
+    [field]: {
+      $regex: new RegExp(value),
+      $options: 'i',
+    },
+  };
+}

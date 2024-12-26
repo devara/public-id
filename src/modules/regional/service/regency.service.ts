@@ -1,45 +1,61 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
-import { Regency } from '../schema/regency.schema';
-import { RegionalListReqDto } from '../dto/regional-list.req.dto';
+import { Regency, RegencyDocument } from '../schema/regency.schema';
 import {
-  DEFAULT_CURRENT_PAGE,
-  DEFAULT_PER_PAGE,
-} from 'src/constants/app.constant';
-import { PaginatedDto, PaginatedMetaDto } from 'src/common/dto/paginated.dto';
-import { plainToInstance } from 'class-transformer';
+  RegionalListReqDto,
+  RegionalListSearchReqDto,
+} from '../dto/regional-list.req.dto';
 import { RegencyDto } from '../dto/regency.dto';
 import { DATABASE_CONNECTION_NAME } from 'src/database/constants/database.constant';
+import { RegionalService } from './regional.service';
+import { DatabaseHelperQuerySearch } from 'src/database/decorators/db.decorator';
 
 @Injectable()
-export class RegencyService {
+export class RegencyService extends RegionalService<
+  Regency,
+  RegencyDocument,
+  RegencyDto
+> {
   constructor(
     @InjectModel(Regency.name, DATABASE_CONNECTION_NAME)
-    private model: Model<Regency>,
-  ) {}
-
-  async find(province_id: number, queryDto: RegionalListReqDto) {
-    const { page = DEFAULT_CURRENT_PAGE, per_page = DEFAULT_PER_PAGE } =
-      queryDto;
-    const count = await this.model.countDocuments({ province_id }).lean();
-    const regencies = await this.model
-      .find({ province_id })
-      .limit(per_page)
-      .skip(per_page * (page - 1))
-      .lean();
-
-    return new PaginatedDto(
-      plainToInstance(RegencyDto, regencies),
-      new PaginatedMetaDto(count, queryDto),
-    );
+    model: Model<Regency>,
+  ) {
+    super(model, RegencyDto);
   }
 
-  async findOne(id: number) {
-    const regency = await this.model.findOne({ id }).lean();
+  async getRegencies(province_id: number, queries: RegionalListReqDto) {
+    const [total, list] = await Promise.all([
+      await this.countList({ province_id }),
+      await this.find({ province_id }, queries),
+    ]);
+    return this.mapList({
+      list,
+      total,
+      queries,
+    });
+  }
+
+  async getRegency(id: number) {
+    const regency = await this.findOne({ id });
 
     if (!regency) throw new HttpException('Not Found', HttpStatus.NOT_FOUND);
 
-    return plainToInstance(RegencyDto, regency);
+    return this.mapOne(regency);
+  }
+
+  async searchRegencies(queries: RegionalListSearchReqDto) {
+    const { search } = queries;
+    const searchQuery = DatabaseHelperQuerySearch('name', search);
+    const [total, list] = await Promise.all([
+      await this.countList(searchQuery),
+      await this.find(searchQuery, queries),
+    ]);
+
+    return this.mapList({
+      list,
+      total,
+      queries,
+    });
   }
 }

@@ -3,6 +3,7 @@ import {
   type FilterQuery,
   Model,
   type QueryOptions,
+  SaveOptions,
   type UpdateQuery,
 } from 'mongoose';
 import { DatabaseEntity } from './db.entity';
@@ -113,5 +114,9 @@ export class DatabaseRepository<
       ...options,
       new: true,
     });
+  }
+
+  async save(repository: EntityDocument, options?: SaveOptions) {
+    return repository.save(options);
   }
 }

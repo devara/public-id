@@ -1,15 +1,9 @@
 import { Exclude, Expose } from 'class-transformer';
-import { NumberField, StringField } from 'src/decorators/field.decorator';
+import { RegionalDto } from './regional.dto';
+import { NumberField } from 'src/core/decorators/field.decorator';
 
 @Exclude()
-export class RegencyDto {
-  @Expose()
-  @NumberField({
-    int: true,
-    example: 3404,
-  })
-  id: number;
-
+export class RegencyDto extends RegionalDto {
   @Expose()
   @NumberField({
     int: true,
@@ -17,10 +11,4 @@ export class RegencyDto {
     description: 'Province ID of the regency',
   })
   province_id: number;
-
-  @Expose()
-  @StringField({
-    example: 'KAB. SLEMAN',
-  })
-  name: string;
 }

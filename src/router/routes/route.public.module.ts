@@ -4,7 +4,7 @@ import { AuthPublicController } from 'src/modules/auth/controllers/auth.public.c
 import { UserModule } from 'src/modules/user/user.module';
 
 @Module({
-  controllers: [AuthPublicController],
   imports: [UserModule, AuthModule],
+  controllers: [AuthPublicController],
 })
 export class RoutesPublicModule {}

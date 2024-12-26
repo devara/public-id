@@ -1,5 +1,6 @@
-import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { HydratedDocument } from 'mongoose';
+import { Prop, Schema } from '@nestjs/mongoose';
+import { DatabaseSchema } from 'src/database/decorators/db.decorator';
+import { IDatabaseDocument } from 'src/database/interface/db.interface';
 
 @Schema({ collection: 'loc_villages' })
 export class Village {
@@ -13,6 +14,6 @@ export class Village {
   name: string;
 }
 
-export type VillageDocument = HydratedDocument<Village>;
+export type VillageDocument = IDatabaseDocument<Village>;
 
-export const VillageSchema = SchemaFactory.createForClass(Village);
+export const VillageSchema = DatabaseSchema(Village);

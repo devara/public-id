@@ -1,5 +1,6 @@
-import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { HydratedDocument } from 'mongoose';
+import { Prop, Schema } from '@nestjs/mongoose';
+import { DatabaseSchema } from 'src/database/decorators/db.decorator';
+import { IDatabaseDocument } from 'src/database/interface/db.interface';
 
 @Schema({ collection: 'loc_regencies' })
 export class Regency {
@@ -13,6 +14,6 @@ export class Regency {
   name: string;
 }
 
-export type RegencyDocument = HydratedDocument<Regency>;
+export type RegencyDocument = IDatabaseDocument<Regency>;
 
-export const RegencySchema = SchemaFactory.createForClass(Regency);
+export const RegencySchema = DatabaseSchema(Regency);

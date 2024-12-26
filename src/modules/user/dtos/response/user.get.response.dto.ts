@@ -5,7 +5,7 @@ import {
   ENUM_USER_GENDER,
   ENUM_USER_SIGN_UP_FROM,
   ENUM_USER_STATUS,
-} from 'src/modules/user/enum/user.enum';
+} from 'src/modules/user/enums/user.enum';
 import { DatabaseDto } from 'src/database/dtos/database.dto';
 
 export class UserGetResponseDto extends DatabaseDto {
@@ -89,10 +89,4 @@ export class UserGetResponseDto extends DatabaseDto {
     nullable: true,
   })
   gender?: ENUM_USER_GENDER;
-
-  @ApiProperty({
-    example: faker.string.uuid(),
-    required: true,
-  })
-  country: string;
 }

@@ -8,7 +8,7 @@ import {
   ENUM_USER_GENDER,
   ENUM_USER_SIGN_UP_FROM,
   ENUM_USER_STATUS,
-} from '../enum/user.enum';
+} from '../enums/user.enum';
 import { IDatabaseDocument } from 'src/database/interface/db.interface';
 
 @Schema({ collection: 'users' })
@@ -20,6 +20,17 @@ export class UserEntity extends DatabaseEntity {
     type: String,
   })
   name: string;
+
+  @DatabaseProp({
+    required: true,
+    index: true,
+    trim: true,
+    type: String,
+    maxlength: 50,
+    minlength: 3,
+    unique: true,
+  })
+  username: string;
 
   @DatabaseProp({
     required: true,

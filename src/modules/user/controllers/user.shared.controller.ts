@@ -9,7 +9,8 @@ import {
 } from '@nestjs/common';
 import { ClientSession, Connection } from 'mongoose';
 import { InjectDatabaseConnection } from 'src/database/decorators/db.decorator';
-import { UserService } from '../service/user.service';
+import { UserService } from '../services/user.service';
+import { ActivityService } from 'src/modules/activity/services/activity.service';
 import {
   AuthJwtAccessProtected,
   AuthJwtPayload,
@@ -21,6 +22,7 @@ import { Response } from 'src/core/response/decorators/response.decorator';
 import { UserUpdateUsernameRequestDto } from '../dtos/request/user.update-username.dto';
 import { ENUM_USER_STATUS_CODE_ERROR } from '../enums/user.status-code.enum';
 import { UserUpdateProfileRequestDto } from '../dtos/request/user.update-profile.dto';
+import { ENUM_ACTIVITY_TYPE } from 'src/modules/activity/enums/activity.enum';
 
 @Controller({
   path: '/user',
@@ -30,6 +32,7 @@ export class UserSharedController {
     @InjectDatabaseConnection()
     private readonly databaseConnection: Connection,
     private readonly userService: UserService,
+    private readonly activityService: ActivityService,
   ) {}
 
   @Response()
@@ -44,18 +47,31 @@ export class UserSharedController {
   }
 
   @AuthJwtAccessProtected()
-  @Put('/update/profile')
+  @Put('/profile')
   async updateProfile(
     @AuthJwtPayload<AuthJwtAccessPayloadDto>('_id', UserParsePipe)
     user: UserDocument,
     @Body()
     { ...body }: UserUpdateProfileRequestDto,
   ) {
+    const canUpdate = await this.userService.canUpdateProfile(user);
+    if (!canUpdate) {
+      throw new ForbiddenException({
+        message: 'Only can update profile every 1 minute',
+      });
+    }
+
     const session: ClientSession = await this.databaseConnection.startSession();
     session.startTransaction();
 
     try {
       await this.userService.updateProfile(user, { ...body });
+      await this.activityService.createByUser(user, {
+        description: 'User update profile',
+        type: ENUM_ACTIVITY_TYPE.USER,
+        type_id: user._id,
+      });
+
       await session.commitTransaction();
       await session.endSession();
 
@@ -91,15 +107,27 @@ export class UserSharedController {
       });
     }
 
+    const canUpdate = await this.userService.canUpdateUsername(user);
+    if (!canUpdate) {
+      throw new ForbiddenException({
+        message: 'Only can update username every 1 hour',
+      });
+    }
+
     const session: ClientSession = await this.databaseConnection.startSession();
     session.startTransaction();
     try {
       await this.userService.updateUsername(user, { username });
+      await this.activityService.createByUser(user, {
+        description: 'User change username',
+        type: ENUM_ACTIVITY_TYPE.USER,
+        type_id: user._id,
+      });
 
       await session.commitTransaction();
       await session.endSession();
 
-      return { message: 'Success update username' };
+      return { message: 'Success change username' };
     } catch (err: any) {
       await session.abortTransaction();
       await session.endSession();

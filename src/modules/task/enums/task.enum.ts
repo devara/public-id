@@ -1,0 +1,6 @@
+export enum ENUM_TASK_STATUS {
+  DONE = 'DONE',
+  ONGOING = 'ONGOING',
+  HOLD = 'HOLD',
+  CANCEL = 'CANCEL',
+}

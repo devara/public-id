@@ -2,6 +2,7 @@ import {
   CreateOptions,
   type FilterQuery,
   Model,
+  PopulateOptions,
   type QueryOptions,
   SaveOptions,
   type UpdateQuery,
@@ -14,9 +15,14 @@ export class DatabaseRepository<
   EntityDocument extends IDatabaseDocument<Entity>,
 > {
   protected readonly repository: Model<Entity>;
+  readonly _join?: PopulateOptions | (string | PopulateOptions)[];
 
-  constructor(respository: Model<Entity>) {
+  constructor(
+    respository: Model<Entity>,
+    options?: PopulateOptions | (string | PopulateOptions)[],
+  ) {
     this.repository = respository;
+    this._join = options;
   }
 
   async findAll<T = EntityDocument>(
@@ -37,6 +43,14 @@ export class DatabaseRepository<
 
     if (options?.order) {
       query.sort(options.order);
+    }
+
+    if (options?.join) {
+      query.populate(
+        (typeof options.join === 'boolean' && options.join
+          ? this._join
+          : options.join) as PopulateOptions | (string | PopulateOptions)[],
+      );
     }
 
     return query.exec();
@@ -118,5 +132,9 @@ export class DatabaseRepository<
 
   async save(repository: EntityDocument, options?: SaveOptions) {
     return repository.save(options);
+  }
+
+  async deleteOneById(_id: string) {
+    return this.repository.deleteOne({ _id });
   }
 }

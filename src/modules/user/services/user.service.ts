@@ -98,8 +98,23 @@ export class UserService {
     { username }: UserUpdateUsernameRequestDto,
   ) {
     repository.username = username;
-    repository.updatedAt = this.dateService.create();
+    repository.usernameUpdatedAt = this.dateService.create();
     return this.userRepository.save(repository);
+  }
+
+  async canUpdateUsername(user: UserDocument): Promise<boolean> {
+    if (user.usernameUpdatedAt) {
+      const now = this.dateService.create();
+      const diff = this.dateService.getDiff(
+        user.usernameUpdatedAt,
+        now,
+        'hours',
+      );
+
+      return diff > 1;
+    }
+
+    return true;
   }
 
   async updateProfile(
@@ -110,6 +125,16 @@ export class UserService {
     repository.gender = gender;
     repository.updatedAt = this.dateService.create();
     return this.userRepository.save(repository);
+  }
+
+  async canUpdateProfile(user: UserDocument): Promise<boolean> {
+    if (user.updatedAt) {
+      const now = this.dateService.create();
+      const diff = this.dateService.getDiff(user.updatedAt, now, 'minutes');
+
+      return diff > 1;
+    }
+    return true;
   }
 
   async mapProfile(user: UserDocument) {

@@ -17,7 +17,6 @@ export class DatabaseEntity {
 
   @DatabaseProp({
     required: false,
-    index: 'asc',
     type: Date,
     default: new Date(),
   })
@@ -25,7 +24,6 @@ export class DatabaseEntity {
 
   @DatabaseProp({
     required: false,
-    index: 'asc',
     type: Date,
     default: new Date(),
   })
@@ -33,7 +31,6 @@ export class DatabaseEntity {
 
   @DatabaseProp({
     required: false,
-    index: true,
     type: Date,
   })
   deletedAt?: Date;

@@ -8,16 +8,18 @@ import {
   NotFoundException,
   Post,
 } from '@nestjs/common';
-import { UserService } from 'src/modules/user/service/user.service';
-import { AuthRegisterRequestDto } from '../dtos/request/auth.register.request.dto';
+import { UserService } from 'src/modules/user/services/user.service';
 import { AuthService } from '../services/auth.service';
+import { ActivityService } from 'src/modules/activity/services/activity.service';
 import { InjectDatabaseConnection } from 'src/database/decorators/db.decorator';
-import { Connection } from 'mongoose';
+import { ClientSession, Connection } from 'mongoose';
+import { AuthRegisterRequestDto } from '../dtos/request/auth.register.request.dto';
 import { AuthLoginRequestDto } from '../dtos/request/auth.login.request.dto';
 import { AuthLoginResponseDto } from '../dtos/response/auth.login.response.dto';
 import { ENUM_USER_STATUS } from 'src/modules/user/enums/user.enum';
 import { ENUM_USER_STATUS_CODE_ERROR } from 'src/modules/user/enums/user.status-code.enum';
 import { Response } from 'src/core/response/decorators/response.decorator';
+import { ENUM_ACTIVITY_TYPE } from 'src/modules/activity/enums/activity.enum';
 
 @Controller({
   path: '/auth',
@@ -28,6 +30,7 @@ export class AuthPublicController {
     private readonly databaseConnection: Connection,
     private readonly userService: UserService,
     private readonly authService: AuthService,
+    private readonly activityService: ActivityService,
   ) {}
 
   @Response()
@@ -46,6 +49,8 @@ export class AuthPublicController {
 
     const password = await this.authService.createPassword(passwordString);
 
+    const session: ClientSession = await this.databaseConnection.startSession();
+    session.startTransaction();
     try {
       const user = await this.userService.signUp(
         {
@@ -56,10 +61,22 @@ export class AuthPublicController {
         password,
       );
 
+      await this.activityService.createByUser(user, {
+        description: 'User sign up',
+        type: ENUM_ACTIVITY_TYPE.USER,
+        type_id: user._id,
+      });
+
       const token = await this.authService.createToken(user);
+
+      await session.commitTransaction();
+      await session.endSession();
 
       return { data: token };
     } catch (error) {
+      await session.abortTransaction();
+      await session.endSession();
+
       throw new InternalServerErrorException({
         message: 'internalServerError',
         _error: error.message,

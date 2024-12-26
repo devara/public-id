@@ -2,7 +2,7 @@ import { Module } from '@nestjs/common';
 import { ThrottlerModule } from '@nestjs/throttler';
 import { RouterModule } from '../router/router.module';
 import { CoreModule } from '../core/core.module';
-import { ApiModule } from 'src/api/api.module';
+import { WelcomeModule } from 'src/modules/welcome/welcome.module';
 
 @Module({
   imports: [
@@ -13,7 +13,7 @@ import { ApiModule } from 'src/api/api.module';
         limit: 45,
       },
     ]),
-    ApiModule,
+    WelcomeModule,
     RouterModule,
   ],
 })

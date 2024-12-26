@@ -33,6 +33,12 @@ export class UserEntity extends DatabaseEntity {
   username: string;
 
   @DatabaseProp({
+    required: false,
+    type: Date,
+  })
+  usernameUpdatedAt?: Date;
+
+  @DatabaseProp({
     required: true,
     unique: true,
     trim: true,

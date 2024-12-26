@@ -1,4 +1,9 @@
-import type { Document, FilterQuery, QueryOptions } from 'mongoose';
+import type {
+  Document,
+  FilterQuery,
+  PopulateOptions,
+  QueryOptions,
+} from 'mongoose';
 
 export enum ENUM_PAGINATION_ORDER_DIRECTION_TYPE {
   ASC = 'asc',
@@ -21,6 +26,7 @@ export interface IDatabaseOptions<T> {
     [field in string & keyof T]?: ENUM_PAGINATION_ORDER_DIRECTION_TYPE;
   };
   withDeleted?: boolean;
+  join?: boolean | PopulateOptions | PopulateOptions[];
 }
 
 export interface IDatabaseQueryContainOptions {

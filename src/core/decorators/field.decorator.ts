@@ -12,6 +12,7 @@ import {
   IsOptional,
   IsString,
   IsUrl,
+  IsUUID,
   Max,
   MaxLength,
   Min,
@@ -232,12 +233,46 @@ export function PasswordField(
   return applyDecorators(...decorators);
 }
 
+export function UUIDField(
+  options: Omit<ApiPropertyOptions, 'type' | 'format' | 'isArray'> &
+    IFieldOptions = {},
+): PropertyDecorator {
+  const decorators = [Type(() => String), IsUUID('4', { each: options.each })];
+
+  if (options?.required === false)
+    decorators.push(IsOptional({ each: options.each }));
+
+  if (options.nullable) {
+    decorators.push(IsNullable());
+  } else {
+    decorators.push(NotEquals(null));
+  }
+
+  if (options.swagger !== false) {
+    const { required = true, ...restOptions } = options;
+    decorators.push(
+      ApiProperty({
+        type: options.each ? [String] : String,
+        format: 'uuid',
+        isArray: options.each,
+        required: !!required,
+        ...restOptions,
+      }),
+    );
+  }
+
+  return applyDecorators(...decorators);
+}
+
 export function EnumField<TEnum extends object>(
   getEnum: () => TEnum,
   options: Omit<ApiPropertyOptions, 'type' | 'enum' | 'isArray'> &
     IEnumFieldOptions = {},
 ): PropertyDecorator {
   const decorators = [IsEnum(getEnum(), { each: options.each })];
+
+  if (options?.required === false)
+    decorators.push(IsOptional({ each: options.each }));
 
   if (options.nullable) {
     decorators.push(IsNullable());

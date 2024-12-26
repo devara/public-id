@@ -10,10 +10,14 @@ import {
 import { PaginatedDto, PaginatedMetaDto } from 'src/common/dto/paginated.dto';
 import { plainToInstance } from 'class-transformer';
 import { RegencyDto } from '../dto/regency.dto';
+import { DATABASE_CONNECTION_NAME } from 'src/database/constants/database.constant';
 
 @Injectable()
 export class RegencyService {
-  constructor(@InjectModel(Regency.name) private model: Model<Regency>) {}
+  constructor(
+    @InjectModel(Regency.name, DATABASE_CONNECTION_NAME)
+    private model: Model<Regency>,
+  ) {}
 
   async find(province_id: number, queryDto: RegionalListReqDto) {
     const { page = DEFAULT_CURRENT_PAGE, per_page = DEFAULT_PER_PAGE } =

@@ -13,7 +13,7 @@ import {
 import compression from '@fastify/compress';
 import helmet from '@fastify/helmet';
 import fastifyCsrf from '@fastify/csrf-protection';
-import { AppModule } from './app.module';
+import { AppModule } from './app/app.module';
 import { ConfigService } from '@nestjs/config';
 import { AvailableConfigType } from './config/config.type';
 import swaggerSetup from './utils/swagger.setup';

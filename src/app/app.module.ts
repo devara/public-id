@@ -1,13 +1,12 @@
 import { Module } from '@nestjs/common';
-import { AllConfigModule } from './config/config.module';
-import { ApiModule } from './api/api.module';
-import { DatabaseMongooseModule } from './database/db.mongoose.module';
 import { ThrottlerModule } from '@nestjs/throttler';
+import { RouterModule } from '../router/router.module';
+import { CoreModule } from '../core/core.module';
+import { ApiModule } from 'src/api/api.module';
 
 @Module({
   imports: [
-    AllConfigModule,
-    DatabaseMongooseModule,
+    CoreModule,
     ThrottlerModule.forRoot([
       {
         ttl: 60000,
@@ -15,6 +14,7 @@ import { ThrottlerModule } from '@nestjs/throttler';
       },
     ]),
     ApiModule,
+    RouterModule,
   ],
 })
 export class AppModule {}

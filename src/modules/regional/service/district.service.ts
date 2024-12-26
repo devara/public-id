@@ -10,10 +10,14 @@ import {
   DEFAULT_PER_PAGE,
 } from 'src/constants/app.constant';
 import { DistrictDto } from '../dto/district.dto';
+import { DATABASE_CONNECTION_NAME } from 'src/database/constants/database.constant';
 
 @Injectable()
 export class DistrictService {
-  constructor(@InjectModel(District.name) private model: Model<District>) {}
+  constructor(
+    @InjectModel(District.name, DATABASE_CONNECTION_NAME)
+    private model: Model<District>,
+  ) {}
 
   async find(regency_id: number, queryDto: RegionalListReqDto) {
     const { page = DEFAULT_CURRENT_PAGE, per_page = DEFAULT_PER_PAGE } =

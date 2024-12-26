@@ -9,29 +9,34 @@ import { DistrictService } from './service/district.service';
 import { District, DistrictSchema } from './schema/district.schema';
 import { Village, VillageSchema } from './schema/village.schema';
 import { VillageService } from './service/village.service';
+import { DATABASE_CONNECTION_NAME } from 'src/database/constants/database.constant';
 
 @Module({
   imports: [
-    MongooseModule.forFeature([
-      {
-        name: Province.name,
-        schema: ProvinceSchema,
-      },
-      {
-        name: Regency.name,
-        schema: RegencySchema,
-      },
-      {
-        name: District.name,
-        schema: DistrictSchema,
-      },
-      {
-        name: Village.name,
-        schema: VillageSchema,
-      },
-    ]),
+    MongooseModule.forFeature(
+      [
+        {
+          name: Province.name,
+          schema: ProvinceSchema,
+        },
+        {
+          name: Regency.name,
+          schema: RegencySchema,
+        },
+        {
+          name: District.name,
+          schema: DistrictSchema,
+        },
+        {
+          name: Village.name,
+          schema: VillageSchema,
+        },
+      ],
+      DATABASE_CONNECTION_NAME,
+    ),
   ],
   controllers: [RegionalController],
   providers: [ProvinceService, RegencyService, DistrictService, VillageService],
+  exports: [ProvinceService, RegencyService, DistrictService, VillageService],
 })
 export class RegionalModule {}

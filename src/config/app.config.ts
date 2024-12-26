@@ -84,5 +84,6 @@ export default registerAs<AppConfig>('app', () => {
     fallbackLanguage: process.env.APP_FALLBACK_LANGUAGE || 'en',
     logLevel: process.env.APP_LOG_LEVEL || 'warn',
     logService: process.env.APP_LOG_SERVICE || LogService.CONSOLE,
+    timezone: process.env.APP_TIMEZONE,
   };
 });

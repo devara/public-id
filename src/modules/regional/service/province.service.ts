@@ -10,10 +10,14 @@ import {
   DEFAULT_CURRENT_PAGE,
   DEFAULT_PER_PAGE,
 } from 'src/constants/app.constant';
+import { DATABASE_CONNECTION_NAME } from 'src/database/constants/database.constant';
 
 @Injectable()
 export class ProvinceService {
-  constructor(@InjectModel(Province.name) private model: Model<Province>) {}
+  constructor(
+    @InjectModel(Province.name, DATABASE_CONNECTION_NAME)
+    private model: Model<Province>,
+  ) {}
 
   async find(queryDto: RegionalListReqDto) {
     const { page = DEFAULT_CURRENT_PAGE, per_page = DEFAULT_PER_PAGE } =

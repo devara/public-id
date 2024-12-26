@@ -1,13 +1,12 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
-import appConfig from './app.config';
-import databaseConfig from '../database/config/database.config';
+import configs from 'src/config';
 
 @Module({
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
-      load: [appConfig, databaseConfig],
+      load: configs,
       envFilePath: ['.env'],
     }),
   ],

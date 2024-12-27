@@ -1,7 +1,7 @@
-import { Injectable, UnauthorizedException } from '@nestjs/common';
+import { HttpStatus, Injectable, UnauthorizedException } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { AuthJwtAccessPayloadDto } from '../../dtos/jwt/auth.jwt.access-payload.dto';
-import { ENUM_AUTH_STATUS_CODE_ERROR } from '../../enums/auth.status-code.enum';
+import { STATUS_CODES } from 'http';
 
 @Injectable()
 export class AuthJwtAccessGuard extends AuthGuard('jwtAccess') {
@@ -12,8 +12,8 @@ export class AuthJwtAccessGuard extends AuthGuard('jwtAccess') {
   ): T {
     if (err || !user) {
       throw new UnauthorizedException({
-        statusCode: ENUM_AUTH_STATUS_CODE_ERROR.JWT_ACCESS_TOKEN,
-        message: 'no jwt token',
+        statusCode: HttpStatus.UNAUTHORIZED,
+        message: STATUS_CODES[HttpStatus.UNAUTHORIZED],
         _error: err ? err.message : info.message,
       });
     }

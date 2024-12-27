@@ -29,7 +29,7 @@ export class AuthJwtRefreshStrategy extends PassportStrategy(
           infer: true,
         }),
       },
-      secretOrKey: configService.get('auth.jwt.accessToken.secretKey', {
+      secretOrKey: configService.get('auth.jwt.refreshToken.secretKey', {
         infer: true,
       }),
     });

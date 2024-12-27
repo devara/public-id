@@ -4,6 +4,7 @@ import {
   Controller,
   ForbiddenException,
   Get,
+  HttpStatus,
   InternalServerErrorException,
   Put,
 } from '@nestjs/common';
@@ -20,7 +21,6 @@ import { UserDocument } from '../entity/user.entity';
 import { UserParsePipe } from '../pipes/user.parse.pipe';
 import { Response } from 'src/core/response/decorators/response.decorator';
 import { UserUpdateUsernameRequestDto } from '../dtos/request/user.update-username.dto';
-import { ENUM_USER_STATUS_CODE_ERROR } from '../enums/user.status-code.enum';
 import { UserUpdateProfileRequestDto } from '../dtos/request/user.update-profile.dto';
 import { ENUM_ACTIVITY_TYPE } from 'src/modules/activity/enums/activity.enum';
 
@@ -80,14 +80,14 @@ export class UserSharedController {
       await session.abortTransaction();
       await session.endSession();
       throw new InternalServerErrorException({
-        statusCode: 5040,
+        statusCode: HttpStatus.INTERNAL_SERVER_ERROR,
         _error: err.message,
       });
     }
   }
 
   @AuthJwtAccessProtected()
-  @Put('/update/username')
+  @Put('/username')
   async updateUsername(
     @AuthJwtPayload<AuthJwtAccessPayloadDto>('_id', UserParsePipe)
     user: UserDocument,
@@ -102,7 +102,7 @@ export class UserSharedController {
     const isUsernameExists = await this.userService.existByUsername(username);
     if (isUsernameExists) {
       throw new ConflictException({
-        statusCode: ENUM_USER_STATUS_CODE_ERROR.USERNAME_EXIST,
+        statusCode: HttpStatus.CONFLICT,
         message: 'Username already taken',
       });
     }
@@ -132,7 +132,7 @@ export class UserSharedController {
       await session.abortTransaction();
       await session.endSession();
       throw new InternalServerErrorException({
-        statusCode: 5040,
+        statusCode: HttpStatus.INTERNAL_SERVER_ERROR,
         _error: err.message,
       });
     }

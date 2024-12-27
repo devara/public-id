@@ -1,12 +1,13 @@
 import {
-  BadRequestException,
   Body,
   ConflictException,
   Controller,
   ForbiddenException,
+  HttpStatus,
   InternalServerErrorException,
   NotFoundException,
   Post,
+  UnauthorizedException,
 } from '@nestjs/common';
 import { UserService } from 'src/modules/user/services/user.service';
 import { AuthService } from '../services/auth.service';
@@ -15,11 +16,16 @@ import { InjectDatabaseConnection } from 'src/database/decorators/db.decorator';
 import { ClientSession, Connection } from 'mongoose';
 import { AuthRegisterRequestDto } from '../dtos/request/auth.register.request.dto';
 import { AuthLoginRequestDto } from '../dtos/request/auth.login.request.dto';
-import { AuthLoginResponseDto } from '../dtos/response/auth.login.response.dto';
 import { ENUM_USER_STATUS } from 'src/modules/user/enums/user.enum';
-import { ENUM_USER_STATUS_CODE_ERROR } from 'src/modules/user/enums/user.status-code.enum';
 import { Response } from 'src/core/response/decorators/response.decorator';
 import { ENUM_ACTIVITY_TYPE } from 'src/modules/activity/enums/activity.enum';
+import { STATUS_CODES } from 'http';
+import {
+  AuthJwtPayload,
+  AuthJwtRefreshProtected,
+  AuthJwtToken,
+} from '../decorators/auth.jwt.decorator';
+import { AuthJwtRefreshPayloadDto } from '../dtos/jwt/auth.jwt.refresh-payload.dto';
 
 @Controller({
   path: '/auth',
@@ -42,8 +48,8 @@ export class AuthPublicController {
     const emailExist = await this.userService.existByEmail(email);
     if (emailExist) {
       throw new ConflictException({
-        statusCode: 5152,
-        message: 'email already taken',
+        statusCode: HttpStatus.CONFLICT,
+        message: 'Email already taken',
       });
     }
 
@@ -78,20 +84,19 @@ export class AuthPublicController {
       await session.endSession();
 
       throw new InternalServerErrorException({
-        message: 'internalServerError',
+        statusCode: HttpStatus.INTERNAL_SERVER_ERROR,
+        message: STATUS_CODES[HttpStatus.INTERNAL_SERVER_ERROR],
         _error: error.message,
       });
     }
   }
 
   @Post('/login')
-  async loginWithPassword(
-    @Body() { email, password }: AuthLoginRequestDto,
-  ): Promise<AuthLoginResponseDto> {
+  async loginWithPassword(@Body() { email, password }: AuthLoginRequestDto) {
     const user = await this.userService.findOneByEmail(email);
     if (!user) {
       throw new NotFoundException({
-        statusCode: 404,
+        statusCode: HttpStatus.NOT_FOUND,
         message: 'Email not found',
       });
     }
@@ -101,13 +106,13 @@ export class AuthPublicController {
       user.password,
     );
     if (!isPasswordValid) {
-      throw new BadRequestException({
-        statusCode: ENUM_USER_STATUS_CODE_ERROR.PASSWORD_NOT_MATCH,
+      throw new UnauthorizedException({
+        statusCode: HttpStatus.UNAUTHORIZED,
         message: 'Password not match',
       });
     } else if (user.status !== ENUM_USER_STATUS.ACTIVE) {
       throw new ForbiddenException({
-        statusCode: ENUM_USER_STATUS_CODE_ERROR.INACTIVE_FORBIDDEN,
+        statusCode: HttpStatus.FORBIDDEN,
         message: 'User Inactive',
       });
     }
@@ -115,12 +120,30 @@ export class AuthPublicController {
     try {
       const token = await this.authService.createToken(user);
 
-      return token;
+      return {
+        data: token,
+      };
     } catch (error) {
       throw new InternalServerErrorException({
-        message: 'internalServerError',
+        statusCode: HttpStatus.INTERNAL_SERVER_ERROR,
+        message: STATUS_CODES[HttpStatus.INTERNAL_SERVER_ERROR],
         _error: error.message,
       });
     }
+  }
+
+  @AuthJwtRefreshProtected()
+  @Post('/refresh')
+  async refresh(
+    @AuthJwtToken() refreshToken: string,
+    @AuthJwtPayload<AuthJwtRefreshPayloadDto>()
+    { _id }: AuthJwtRefreshPayloadDto,
+  ) {
+    const user = await this.userService.findOneById(_id);
+    const token = await this.authService.refreshToken(user, refreshToken);
+
+    return {
+      data: token,
+    };
   }
 }
